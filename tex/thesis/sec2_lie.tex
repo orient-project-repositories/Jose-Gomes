@@ -1,0 +1,29 @@
+\section{Lie groups and Lie Algebra}
+\label{sec:sec2_lie}
+
+INCOMPLETO
+
+\subsection{Algebraic groups}
+\label{sec:sec2_groups}
+
+An algebraic group is an algebraic structure with its corresponding operation set. Considering group $A$ and operator $\ast$, the following properties must hold for a structure to be a group.
+
+\begin{itemize}
+    \item Closure: $\forall a_1,a_2 \in A, a_1 \ast a_2 \in A$ 
+    \item Associativity: $\forall a_1,a_2,a_3 \in A, (a_1 \ast a_2) \ast a_3 = a_1 \ast (a_2 \ast a_3)$
+    \item Identity: $\exists a_0 \in A, s.t. \forall a \in A, a_0 \ast a = a \ast a_0 = a$
+    \item Inverse: $\forall a \in A, \exists a^{-1} \in A, s.t., a \ast a^{-1} = a_0$
+\end{itemize}
+
+A Lie group is an algebraic group that is a smooth differentiable manifold. Furthermore, the operator and the inversion are smooth functions.
+
+\subsection{Lie algebra}
+\label{sec:sec2_lie_algebra}
+
+Each Lie group has an associated Lie algebra, corresponding to the tangent space around the identity element of the group, which means that the Lie algebra is a vector space obtained by differentiating the group at the identity transformation. As such, the Lie group representation is desirable when we want to represent differential quantities pertaining to the group, such as velocity and covariance, which are well-represented in the in the tangent space around the transformation, in particular because we can convert any element of the tangent space exactly into a transformation in
+the group through the exponential map, and the adjoint transforms tangent vectors from one tangent space to another.
+
+\subsubsection{Exponential and logarithmic maps}
+
+The exponential and logarithmic map allows the transfer of elements between
+the Lie group and the corresponding Lie algebra. The exponential map locally maps an element of the tangent space to the group, and  the logarithmic map of a Lie group provides the "inverse operation", transferring elements from the Lie group to its tangent space.

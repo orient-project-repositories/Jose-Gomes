@@ -1,0 +1,189 @@
+%\section{Unscented Kalman Filter (UKF)}
+%\label{sec:sec2_ufk}
+\section{Sensor Fusion and Filtering}
+\label{sec:sec_filtering}
+
+It is common to have multiple sensors in a system that produce complementary or redundant readings of the world and/or the state of the system. This may be for several reasons, such as sensor noise, sampling rate, and robustness, among others. For example, one sensor may report information on velocity, whereas another reports on position. These two quantities are related through movement equations, and can be considered redundant, but by combining different types of readings, global uncertainties on the system can be reduced, and limitations of the single sensor may be overcome.
+
+However, how to use use and fuse the readings from multiple sensors is itself a critical part. In this work, the event camera was used in conjunction with an IMU, and so fusing the visual information with inertial information was needed. The solution used was an Unscented Kalman Filter (UKF) (explained in Section\,\ref{sec:sec2_ukf}), which is described in Section\,\ref{sec:sec3_ukf}. The UKF is an extension to the Kalman Filter (explained in Section\,\ref{sec:sec2_kf}) applicable to nonlinear systems.
+
+\subsection{Kalman Filter}
+\label{sec:sec2_kf}
+
+The Kalman Filter \cite{kalman1960new} is an algorithm that can be applied when we have a linear system that follows the model equations \eqref{eq:sec2_kf_pred} (the system equation) and \eqref{eq:sec2_kf_meas} (the measurement equation), namely a linear system that can be represented with a state $s$ that evolves according to Eq.\,\eqref{eq:sec2_kf_pred} and that can be measured by an observer function \eqref{eq:sec2_kf_meas} that provides $z$, that can be somehow related linearly to the state. $v(k)$ is the state noise process, $u(k)$ is the input to the system, and $w(k)$ is the measurement noise. Both noises are assumed to be zero-mean Gaussian white noise (Eqs.\,\eqref{eq:sec2_noises} and \eqref{eq:sec2_noises_cov}). Furthermore, $x(k) \in \mathbb{R} ^n$, $u(k) \in \mathbb{R} ^m$, $w(k) \in \mathbb{R} ^n$, $v(k) \in \mathbb{R} ^q$, and $y(k) \in \mathbb{R} ^q$.
+
+\begin{equation}
+    \label{eq:sec2_kf_pred}
+    x(k+1) = F x(k) + B u(k) + G v(k)
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_kf_meas}
+    z(k) = H x(k) + w(k)
+\end{equation}
+
+\begin{equation}
+    \label{eq:sec2_noises}
+    E(w(k)) = E(v(k)) = 0
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_noises_cov}
+    \begin{bmatrix}
+        \bigl(\begin{smallmatrix}
+        w(k)\\ 
+        v(k)
+        \end{smallmatrix}\bigr) &\bigl(\begin{smallmatrix}
+        w(m)^T & v(m)^T
+        \end{smallmatrix}\bigr) 
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+        R_1 &0 \\ 
+         0 & R_2 
+        \end{bmatrix}
+        \delta(k-m)
+\end{equation}
+
+With this formulation, the optimal estimator is given by a set of equations that relate to the prediction of the state based on the input to the system (Eqs.\,\eqref{eq:sec2_kf_pred1} to \eqref{eq:sec2_kf_pred2}), and another set related to the update and correction of the estimate (Eqs.\,\eqref{eq:sec2_kf_obs1} to \eqref{eq:sec2_kf_obs3}), provided by the measurement. 
+
+\begin{equation}
+    \label{eq:sec2_kf_pred1}
+    \hat{x}(k+1 | k) = F \hat{x}(k | k) + B u(k)
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_kf_pred2}
+    P(k+1|k) = F P(k|k) F^T + G R_1 G^T
+\end{equation}
+
+\begin{equation}
+    \label{eq:sec2_kf_obs1}
+     K(k) = P(k|k-1) H^T \left[  H P(k|k-1) H^T + R_2 \right]^{-1}
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_kf_obs2}
+    \hat{x}(k | k) = \hat{x}(k | k-1) + K(k) \left [ z(k) - H \hat{x}(k | k-1) \right ]
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_kf_obs3}
+    P(k|k) = \left[ I - K(k) H \right] P(k|k-1)
+\end{equation}
+
+The Kalman Filter, though optimal, is only applicable to linear systems. As such, alternatives are needed when nonlinear systems are used (which arise particularly in the estimation of rotation in the case of this work). Two extensions to the Kalman Filter are usually considered: the Extended Kalman Filter (EKF) (presented in Section\,\ref{sec:sec2_ekf}) and the Unscented Kalman Filter (UKF) (presented in  Section\,\ref{sec:sec2_ukf}).
+
+\subsection{Extended Kalman Filter (EKF)}
+\label{sec:sec2_ekf}
+
+The Extended Kalman Filter (EKF) is an extension to the Kalman Filter when the system or the measurements from the system are nonlinear, such as the one in \eqref{eq:sec2_ekf_system_pred} and \eqref{eq:sec2_ekf_system_obs}, where functions $f$ and/or $h$ are nonlinear functions. In this case, the system cannot be written in matrix notation (such as Eqs.\,\eqref{eq:sec2_kf_pred} and \eqref{eq:sec2_kf_meas}).%, where $x(k)$ is the $n$-dimensional state of the system at timestep k, $u(k)$ is the input vector, $v(k)$ is the q-dimensional state noise process, $z(k)$ is the observation vector and $w(k)$ is the measurement noise. $v(k)$ and $w(k)$ are zero-mean noises. 
+
+\begin{equation}
+    \label{eq:sec2_ekf_system_pred}
+    x(k+1) = f(x(k),u(k),v(k))
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ekf_system_obs}
+    z(k)=h(x(k), u(k)) + w(k)
+\end{equation}
+
+ As such, there are no $F$ or $H$ matrices that can be used for uncertainty propagation (Eqs.\,\eqref{eq:sec2_kf_pred2} and \eqref{eq:sec2_kf_obs3}), since the system is nonlinear, and therefore functions $f$ and/or $h$ cannot be written as a linear combination of the input variables. Furthermore, due to the nonlinear nature of the system, the covariance $P$ would not preserve the Gaussian nature of the noise.
+
+ EKF solves this problem by linearizing the system dynamics around the predicted and filtered estimates of the state, at each cycle, as shown in Eqs.\,\eqref{eq:sec2_ekf_lin_pre} and \eqref{eq:sec2_ekf_lin_meas}, so that a matrix $F_{k+1}$ and $H_{k+1}$ are generated at each cycle, suitable for use in Eqs.\,\eqref{eq:sec2_kf_pred2} and \eqref{eq:sec2_kf_obs3}, as if the system was linear.
+
+ \begin{equation}
+    \label{eq:sec2_ekf_lin_pre}
+    F_{k+1}=\left. \frac{\partial f}{\partial x}\right|_{\hat{x}_{k+1}|k, u_k}
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ekf_lin_meas}
+    H_{k+1}=\left. \frac{\partial h}{\partial x}\right|_{\hat{x}_{k+1}|k}
+\end{equation}
+
+Clearly, this filter is not optimal, as it does not contemplate the full system model, as well as the effect of the noise on the system. Moreover, the need for the linearization of the model can be cumbersome for large systems. 
+
+Nevertheless, the EKF is a simple extension to the Kalman Filter that allows its usage with nonlinear systems, and generally obtains positive results.
+
+\subsection{Unscented Kalman Filter (UKF)}
+\label{sec:sec2_ukf}
+
+The Unscented Kalman Filter (UKF) (\cite{julier1997new}) is another extension to the Kalman Filter when the system or the measurements from the system are nonlinear, such as the one in \eqref{eq:sec2_ukf_system_pred} and \eqref{eq:sec2_ukf_system_obs}. This situation is similar to the one in the EKF (Section\,\ref{sec:sec2_ekf})%, where $x(k)$ is the $n$-dimensional state of the system at timestep k, $u(k)$ is the input vector, $v(k)$ is the q-dimensional state noise process, $z(k)$ is the observation vector and $w(k)$ is the measurement noise. $v(k)$ and $w(k)$ are zero-mean noises. 
+
+\begin{equation}
+    \label{eq:sec2_ukf_system_pred}
+    x(k+1) = f(x(k),u(k),v(k))
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_system_obs}
+    z(k)=h(x(k), u(k)) + w(k)
+\end{equation}
+
+Unlike the Extended Kalman Filter (EKF, Section \ref{sec:sec2_ekf}), which can also be used with nonlinear functions, the UKF does not linearize these functions when propagating the uncertainty, and instead tries to approximate distribution of the output to a Gaussian distribution by using an unscented transform. This procedure works by choosing a set of sigma points ($2L+1$ points, corresponding to 2 points around the current estimate for each dimension in the state vector, plus the mean) which are subject to the nonlinear transformation and used to approximate the output distribution. These points are given by Eqs.\,\eqref{eq:sec2_ukf_sigma1} to \eqref{eq:sec2_ukf_sigma3}, with corresponding weights $W_i$ associated to each point, and is illustrated by Fig.\,\ref{fig:sec2_unscent}. Furthermore, $\bar{x}$ represents the mean of state $x$, $P_{xx}$ its covariance, $i \in [1,2n]$, and $\kappa \in \mathbb{R}$ is a tuning parameter.
+
+\begin{equation}
+    \label{eq:sec2_ukf_sigma1}
+    \chi_0 = \bar{x}, W_0 = k/(n+\kappa)
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_sigma2}
+    \chi_i = \bar{x} + \left( \sqrt{(n+k)P_{xx}} \right), W_i = 1/2(n+\kappa)
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_sigma3}
+    \chi_{i+n} = \bar{x} - \left( \sqrt{(n+k)P_{xx}} \right), W_{i+n} = 1/2(n+\kappa)
+\end{equation}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width = 1\linewidth]{unscent.png}
+    \caption[The principle of the Unscented Transform]{The principle of the Unscented Transform, from \cite{julier1997new}}
+    \label{fig:sec2_unscent}
+\end{figure}
+
+The transformation procedure is then given by Eqs.\,\eqref{eq:sec2_ukf_sigma_exp1} to \eqref{eq:sec2_ukf_sigma_exp3}.
+
+\begin{equation}
+    \label{eq:sec2_ukf_sigma_exp1}
+    y_i=f(\chi_i)
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_sigma_exp2}
+    \bar{y} = \sum_{i=0}^{2n} W_i y_i
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_sigma_exp3}
+    P_{yy} = \sum_{i=0}^{2n} \left( y_i - \bar{y} \right) \left( y_i - \bar{y} \right) ^T
+\end{equation}
+
+This transformation allows us to have the mean and covariance associated with the nonlinear process, without the need to linearize it beforehand, producing a better approximation as well, and these values can then be used in the filter, as shown in Eqs.\,\eqref{eq:sec2_ukf_1} to \eqref{eq:sec2_ukf_7}.
+
+\begin{equation}
+    \label{eq:sec2_ukf_1}
+    \chi_i (k+1|k) = f (\chi_i(k|k),u(k))
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_2}
+    \hat{x}(k+1|k) = \sum_{i=0}^{2n} W_i  \chi_i (k+1|k) 
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_3}
+    P(k+1|k) = \sum_{i=0}^{2n} W_i \left[  \chi_i (k+1|k) - \hat{x}(k+1|k) \right]  \left[  \chi_i (k+1|k) - \hat{x}(k+1|k) \right]^T
+\end{equation}
+
+\begin{equation}
+    \label{eq:sec2_ukf_4}
+    Z_i(k+1|k) = h(\chi_i (k+1|k), u(k))
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_5}
+    \hat{z}(k+1|k) = \sum_{i=0}^{2n} W_i Z_i(k+1|k)
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_6}
+    P_{vv}(k+1|k) = R_1 + \sum_{i=0}^{2n} W_i \left[ Z_i(k|k-1) - \hat{z}(k+1|k) \right] \left[ Z_i(k|k-1) - \hat{z}(k+1|k) \right]^T
+\end{equation}
+\begin{equation}
+    \label{eq:sec2_ukf_7}
+    P_{xz} = \sum_{i=0}^{2n} W_i \left[ \chi_i(k|k-1) - \hat{x}(k+1|k) \right] \left[ Z_i(k|k-1) - \hat{z}(k+1|k) \right]^T
+\end{equation}
+
+By using the UKF, it is not needed to linearize the system equations, which results in a better approximation of the uncertainty of the estimate, since the nonlinearities of the system are somewhat taken into account. Furthermore, the use of the unscented transform also makes the filter more robust to noise (\cite{wan2000unscented}).
+
+\subsection{Square-Root Unscented Kalman Filter (Sr-UKF)}
+\label{sec:sec2_sr_ukf}

@@ -1,0 +1,78 @@
+--batch_size=300
+--update_every_n_events=30
+--displacement_px=0.6
+--patch_size=25
+--max_num_iterations=10
+--tracking_quality=0.6
+--bootstrap="klt"
+--lk_window_size=20
+--num_pyramidal_layers=3
+
+--scale=4
+--display_features=true
+--display_feature_id=false
+--display_feature_patches=false
+--update_every_n_events=20
+--arrow_length=5
+
+--max_corners=100
+--min_corners=0
+--min_distance=10
+--quality_level=0.01
+--block_size=3
+--k=0.04
+
+--first_image_t=-1
+--tracks_file_txt=
+
+roslaunch eklt eklt.launch batch_size:=${EKLT_BATCH_SIZE} block_size:=${EKLT_BLOCK_SIZE} displacement_px:=${EKLT_DISPLACEMENT_PX} lk_window_size:=${EKLT_LK_WINDOW_SIZE} max_corners:=${EKLT_MAX_CORNERS} min_corners:=${EKLT_MIN_CORNERS} max_num_iterations:=${EKLT_MAX_NUM_ITERATIONS} min_distance:=${EKLT_MIN_DISTANCE} num_pyramidal_layers:=${EKLT_NUM_PYRAMIDAL_LAYERS} patch_size:=${EKLT_PATCH_SIZE} quality_level:=${EKLT_QUALITY_LEVEL} scale:=${EKLT_SCALE} tracking_quality:=${EKLT_TRACKING_QUALITY} tracks_file_txt:=/tmp/eklt_example/tracks_batch${EKLT_BATCH_SIZE}_block${EKLT_BLOCK_SIZE}_dispx${EKLT_DISPLACEMENT_PX}_lk${EKLT_LK_WINDOW_SIZE}_maxc${EKLT_MAX_CORNERS}_min${EKLT_MIN_CORNERS}_maxiter${EKLT_MAX_NUM_ITERATIONS}_mindist${EKLT_MIN_DISTANCE}_pyr${EKLT_NUM_PYRAMIDAL_LAYERS}_patch${EKLT_PATCH_SIZE}_qual${EKLT_QUALITY_LEVEL}_scale${EKLT_SCALE}_trqual${EKLT_TRACKING_QUALITY}.txt v:=1
+
+
+
+    -batch_size (Determines the size of the event buffer for each patch. If a
+      new event falls into a patch and the buffer is full, the older event in
+      popped.) type: int32 default: 200
+    
+    -block_size (Block size to compute Harris score. passed to harrisCorner and
+      goodFeaturesToTrack.) type: int32 default: 30
+
+    -displacement_px (Controls scaling parameter for batch size calculation:
+      from formula optimal batchsize == 1/Cth * sum |nabla I * v/|v||.
+      displacement_px corresponds to factor 1/Cth) type: double
+      default: 0.59999999999999998
+
+    -lk_window_size (Parameter for KLT. Used for bootstrapping feature.)
+      type: int32 default: 15
+
+    -max_corners (Maximum features allowed to be tracked.) type: int32
+      default: 100
+
+    -max_num_iterations (Maximum number of itrations allowed by the ceres
+      solver to update optical flow direction and warp.) type: int32
+      default: 10
+
+    -min_corners (Minimum features allowed to be tracked.) type: int32
+      default: 60
+
+    -min_distance (Minimum distance between detected features. Parameter passed
+      to goodFeatureToTrack.) type: int32 default: 30
+
+    -num_pyramidal_layers (Parameter for KLT. Used for bootstrapping feature.)
+      type: int32 default: 2
+
+    -patch_size (Determines size of patch around corner. All events that fall
+      in this patch are placed into the features buffer.) type: int32
+      default: 25
+
+    -quality_level (Determines range of harris score allowed between the
+      maximum and minimum. Passed to goodFeaturesToTrack.) type: double
+      default: 0.29999999999999999
+
+    -scale (Rescaling factor for image. Allows to see subpixel tracking.)
+      type: double default: 4
+      
+    -tracking_quality (minimum tracking quality allowed for a feature to be
+      tracked. Can be a number between 0 (bad track) and 1 (good track). Is a
+      rescaled number computed from ECC cost via tracking_quality == 1 -
+      ecc_cost / 4. Note that ceres returns ecc_cost / 2.) type: double
+      default: 0.40000000000000002

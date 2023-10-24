@@ -1,0 +1,99 @@
+:Base ee4enu.HLP
+1 Release notes (read me first)=hlpRelease_notes
+1 Getting Started
+2 About TeXaide=hlpTutAbout
+2 MathType, Equation Editor and TeXaide=hlpMathType_EE_and_TeXaide
+2 Upgrading to MathType=hlpMathType_Upgrade
+2 Getting Started=hlpGetting_started>Main
+2 User Interface Basics
+3 Inserting Symbols=hlpTutInsert_Symbols
+3 Inserting Templates=hlpTutInsert_Templates
+3 Placing the Insertion Point=hlpTutPlacing_Insertion_Point
+3 Moving the Insertion Point=hlpTutMoving_Insertion_Point
+3 Selecting Items in Equations=hlpTutSelecting_Items_in_an_Equation
+3 Exporting Equations=hlpTutExporting_Equations
+3 Drag and Drop=hlpDrag_drop
+2 Tutorials
+3 Tutorial One: Square Roots and Fractions=hlpTutTutorial_One
+3 Tutorial Two: Sums, Subscripts and SuperScripts=hlpTutTutorial_Two
+1 Using TeXaide
+2 Using the Toolbar
+3 Overview=hlpToolbars
+3 Viewing and Positioning=hlpToolbar_Viewing_and_Positioning
+3 Symbol Palettes=hlpToolbar_Symbol_Palettes
+3 Template Palettes=hlpToolbar_Template_Palettes
+3 Navigating Using the Keyboard=hlpToolbar_Navigating_with_the_keyboard
+2 Working with the Keyboard
+3 One-shot Style Shortcuts=hlpOne_shot_style_shortcuts
+2 Fonts
+3 Styles=hlpStyles
+2 Translating Equations
+3 Translators=hlpTranslators
+3 Translators Dialog=hlpTranslators_Dialog
+3 TeX Translators=hlpTeX
+3 Translation Issues=hlpTranslationIssues
+2 Extending TeXaide
+3 Creating a New Translator=hlpCreating_a_new_translator
+2 Other Topics
+3 Replacing One Template by Another=hlpReplacing_one_template_by_another
+3 Status Bar=hlpStatus_Bar
+1 TeXaide Reference
+2 Start Menu items=hlpStart_Menu
+2 Menus
+3 File menu=hlpFile_menu
+3 Edit menu=hlpEdit_menu
+3 View menu=hlpView_menu
+3 Format menu=hlpFormat_menu
+3 Style menu=hlpStyle_menu
+3 Size menu=hlpSize_menu
+3 Help menu=hlpHelp_menu
+3 MathType on the Web Sub-menu=hlpMathType_on_the_Web_sub_menu
+2 Dialogs
+3 Define Sizes Dialog=hlpDefine_Sizes_Dialog
+3 Define Spacing Dialog=hlpDefine_Spacing_Dialog
+3 Define Styles Dialog=hlpDefine_Styles_Dialog
+3 Matrix Dialog=hlpMatrix_Dialog
+3 Other Size Dialog=hlpOther_Size_Dialog
+3 Other Style Dialog=hlpOther_Style_Dialog
+3 Translators Dialog=hlpTranslators_Dialog
+3 Zoom Dialog=hlpZoom_Dialog
+1 Getting Help
+2 Ways to Get Assistance While You Work=hlpWays_to_get_assistance_while_you_work
+2 Getting Help at the MathType Web Site=hlpGetting_help_at_the_MathType_web_site
+2 Technical Support=hlpTechnical_support
+2 Giving us Feedback=hlpGiving_us_feedback
+1 Installing TeXaide
+2 Installing TeXaide=hlpSU_Installing_MathType
+2 TeXaide Setup=hlpSU_InstallRemoveDialog
+2 Removing TeXaide=hlpSU_Removing_MathType
+2 Moving TeXaide to a Different Folder=hlpSU_Moving_MathType
+2 Start Menu Items=hlpStart_Menu
+1 License Agreement
+2 TexAide's End-Use License Agreement=hlpMathType_s_end_user_license_agreement
+1 Glossary
+2 Character Style=hlpcharacter_style
+2 Clipboard=hlpclipboard
+2 Current Equation=hlpCurrent_Equation
+2 Default Web Browser=hlpdefault_web_browser
+2 Encoding=hlpFont_encoding
+2 Expanding Integrals=hlpExpanding_integrals
+2 Focus=hlpFocus
+2 Font=hlpFont
+2 Font Encoding=hlpFont_encoding
+2 Function=hlpfunction
+2 Insertion Point=hlpInsertion_point
+2 Keyboard Shortcuts=hlpkeyboard_shortcuts
+2 Math Axis=hlpmath_axis
+2 Nudging=hlpNudging
+2 Pile=hlppile
+2 Points=hlppoints
+2 Relational Operator=hlprelational_operator
+2 Slot=hlpslot
+2 Styles=hlpStyles
+2 Symbol=hlpSymbol
+2 Template=hlptemplate
+2 TeX=hlpTeX
+2 Typesizes=hlptypesizes
+2 Units=hlpunits
+2 World Wide Web Consortium (W3C)=hlpThe_World_Wide_Web_Consortium_W3C
+2 Web Browser=hlpweb_browser

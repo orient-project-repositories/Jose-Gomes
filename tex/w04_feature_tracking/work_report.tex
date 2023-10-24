@@ -1,0 +1,78 @@
+\documentclass[10pt,onecolumn]{IEEEtran}
+% replace the keyword "twocolumn" by "onecolumn" if you want a single column document
+
+% ------------------------------------------------------------------------------------
+% If you are using *TeXnicCenter*, already configured with profiles as "LaTeX -> PDF",
+% do the following to create a project and have the compile hotkey Ctrl+F5:
+%     Project -> Create with active file as the main file
+% Do not forget to select "Uses BibTeX"
+% ------------------------------------------------------------------------------------
+
+% some useful packages:
+\usepackage{graphicx}
+\graphicspath{{./}{./figs/}{../figs/}{../figs/sec2_feature_tracking/}} % share figs using ../figs/
+\usepackage{url}
+
+\begin{document}
+
+\title{Feature tracking}
+\author{Jos\'e Pedro Gomes}
+
+\maketitle
+
+\begin{abstract}
+
+Work report comparing the different approaches to tracking features.
+
+\end{abstract}
+ 
+\section{Introduction}
+
+Having identified features, an important step is being able to match them or track them across multiple frames. As such, it is important to choose features which are unique and not easily mismatched (distinct features), as well as features that are easy to reidentify from multiple angles (robust and stable features, invariant to viewing direction and distance, and illumination variances).
+
+A simple approach is to use a global minimization approach through the Sum of Squared Distances (SSD) between the features being proposed as a match, with the underlying principle that matching features are close to each other in consecutive frames. However, this is not always the case. Also, this approach complicates feature reidentification whenever it exits and re-enters the frame, and is also slow. This technique is better suited for template tracking across frames, assuming rigid body motion, which is not always the case, with independent feature movement.
+
+To facilitate feature matching in classical cameras, along with the features detected (interest points), image descriptors around these points are also preserved, which are then compared for matching. This approach is used by Scale-Invariant Feature Transform (SIFT \cite{lowe1999object}), Speeded Up Robust Features (SURF \cite{bay2006surf}) and similar approaches.
+
+\section{SIFT}
+
+
+
+\subsection{SIFT Identification}
+
+
+
+\subsection{SIFT descriptors}
+
+
+\section{SIFT}
+
+
+
+\subsection{SIFT Identification}
+
+
+
+\subsection{SIFT descriptors}
+
+\section{Event cameras}
+
+For event cameras, a typical choice of features, as previously presented, are corners. However, the choice of descriptors for matching and tracking is not yet as developed as for classic cameras.
+
+\section{SSD}
+
+A first approach is to rely on the fast nature of events, and to create pseudo-frames by combining features over a timeslice. The features of both pseudo-frames can then be matched using SSD, assuming a proximity between features in consecutive pseudo-frames. 
+
+Nevertheless, this approach is not ideal, as a critical parameter is the time of integration in the timeslice, which does not take full advantage of the nature of events and event cameras, and could be so slow as to have the same temporal resolution as conventional cameras.
+
+\section{Spatiotemporal tracking}
+\subsection{First Subsection}
+
+\subsection{Second Subsection}
+
+
+\bibliographystyle{plain}
+\bibliography{../thesis/ref}
+% replace "project" by "thesis" if you are doing the thesis
+
+\end{document}

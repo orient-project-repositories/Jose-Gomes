@@ -1,0 +1,64 @@
+Obective:
+    Tutorial on how to install the ESIM simulator from UZH.
+    This simulator allows the generation of events from images, videos and virtual 3D scenes.
+
+Requisites:
+    Ubuntu 16.04 and ROS kinetic.
+
+
+Instructions (adapted from https://github.com/uzh-rpg/rpg_esim/wiki/Installation):
+    
+    Create a catkin workspace specifically for the simulator as follows:
+
+        mkdir -p ~/sim_ws/src && cd ~/sim_ws
+        catkin init
+        catkin config --extend /opt/ros/kinetic --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+    Install vcstools if you do not have it already:
+
+      sudo apt-get install python-vcstool
+
+    Clone this repository and run vcstools:
+
+        cd src/
+        git clone git@github.com:uzh-rpg/rpg_esim.git
+        vcs-import < rpg_esim/dependencies.yaml
+
+    Install pcl_ros:
+
+        sudo apt-get install ros-kinetic-pcl-ros
+
+    Install glfw:
+
+        sudo apt-get install libglfw3 libglfw3-dev
+
+    Install glm:
+
+        sudo apt-get install libglm-dev
+
+    Optionally install the trajectory server:
+
+    s   udo apt-get install ros-kinetic-hector-trajectory-server
+
+    Disable the packages that are not needed:
+
+        cd ze_oss
+        touch imp_3rdparty_cuda_toolkit/CATKIN_IGNORE \
+            imp_app_pangolin_example/CATKIN_IGNORE \
+            imp_benchmark_aligned_allocator/CATKIN_IGNORE \
+            imp_bridge_pangolin/CATKIN_IGNORE \
+            imp_cu_core/CATKIN_IGNORE \
+            imp_cu_correspondence/CATKIN_IGNORE \
+            imp_cu_imgproc/CATKIN_IGNORE \
+            imp_ros_rof_denoising/CATKIN_IGNORE \
+            imp_tools_cmd/CATKIN_IGNORE \
+            ze_data_provider/CATKIN_IGNORE \
+            ze_geometry/CATKIN_IGNORE \
+            ze_imu/CATKIN_IGNORE \
+            ze_trajectory_analysis/CATKIN_IGNORE
+
+    Build the event_camera_simulator node:
+
+        catkin build esim_ros
+
+    To test the installation, run the test in 200417_ev_sim_planar_tst.

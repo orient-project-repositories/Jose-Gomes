@@ -1,0 +1,9 @@
+
+Software to install (by this order!):
+
+1. ghostscript & ghostview
+2. miktex
+3. texniccenter
+4. (texaide 4 - not free anymore; the free version can still be found in the internet?)
+5. create temporary folder and do a test: svn://svn.isr.ist.utl.pt/jag/tex_samples
+	[^^ do export instead of checkout of this repository]

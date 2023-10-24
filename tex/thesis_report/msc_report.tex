@@ -1,0 +1,56 @@
+\documentclass[a4paper,journal]{IEEEtran} % 10pt
+%\documentclass[a4paper,conference]{IEEEtran} % 10pt
+%\documentclass[a4paper,12pt,conference]{IEEEtran}
+
+%\IEEEoverridecommandlockouts   % This command is only needed if you want to use the \thanks command
+%\overrideIEEEmargins           % provide a wider margin on the binding edge
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage{graphicx}
+\graphicspath{{./}{./figs/}{../figs/}} % share figs using ../figs/
+%\usepackage{subfigure}
+\usepackage{amssymb}
+\usepackage{amsmath}
+%\usepackage{amsthm}          
+\usepackage{url}
+%\usepackage{glossary}
+%\usepackage[affil-it]{authblk} 
+%\usepackage[linktocpage=true]{hyperref}
+%\usepackage{setspace}
+%\usepackage{xspace} 
+
+\title{Thesis Report Title}
+
+\author{
+%{\parbox{\linewidth}{\centering Author1, Jos\'e Gaspar} } \\
+{\parbox{\linewidth}{\centering Author1, Author2} } \\
+\parbox{\linewidth} {\centering 
+%Institute for Systems and Robotics, Instituto Superior T\'ecnico / UTL, Lisbon, Portugal\\
+Instituto Superior T\'ecnico / UTL, Lisbon, Portugal\\
+{\tt\small email1, email2}}
+%\thanks{This work has been partially supported by ... .}
+} % end of author{}
+
+
+\begin{document}
+
+\maketitle
+
+\input{sec0_abstract}
+\input{sec1_intro}
+\input{sec2_meth1}
+\input{sec3_meth2}
+\input{sec4_experiments}
+\input{sec5_conclusion}
+
+\appendix
+\input{secx0_app}
+\input{secx1_app}
+
+\bibliographystyle{plain}
+\bibliography{secz}
+
+\end{document}

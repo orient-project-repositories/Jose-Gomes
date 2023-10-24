@@ -1,0 +1,13 @@
+Software information
+
+This code was mainly developed with Matlab and ROS Kinetic, using Ubuntu 16.04 (and sometimes Windows).
+
+Matlab 2020a was used.
+ROS Kinetic on Ubuntu 16.04 was used.
+
+For "real" data, rpg_dvs_ros and rpg_eklt are needed.
+For simulation, rpg_dvs_ros and rpg_esim are needed.
+
+rpg_esim https://github.com/uzh-rpg/rpg_esim
+rpg_eklt https://github.com/uzh-rpg/rpg_eklt
+rpg_dvs_ros https://github.com/uzh-rpg/rpg_dvs_ros

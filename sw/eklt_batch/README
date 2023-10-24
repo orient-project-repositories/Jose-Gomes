@@ -1,0 +1,3 @@
+Instructions
+Use xterm (or other terminal that is not gnome-terminal) to launch 2_player.sh. Wait 45-50 seconds and launch 2_killer.sh from another xter terminal. 
+Adjust the path in 2_player.sh for correct file output (ENSURE THE FILE EXISTS, as this script does not write to non-existent directories)

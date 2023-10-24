@@ -1,0 +1,104 @@
+\documentclass[10pt,twocolumn]{IEEEtran}
+% replace the keyword "twocolumn" by "onecolumn" if you want a single column document
+
+% ------------------------------------------------------------------------------------
+% If you are using *TeXnicCenter*, already configured with profiles as "LaTeX -> PDF",
+% do the following to create a project and have the compile hotkey Ctrl+F5:
+%     Project -> Create with active file as the main file
+% Do not forget to select "Uses BibTeX"
+% ------------------------------------------------------------------------------------
+
+% some useful packages:
+\usepackage{graphicx}
+\graphicspath{{./}{./figs/}{../figs/}} % share figs using ../figs/
+\usepackage{url}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Rotation through Orthogonal Procrustes, revisiting Mariana's code}
+\author{Jose Pedro Gomes}
+
+\maketitle
+
+\begin{abstract}
+    Report on technique using Procrustes, with comparison of results between Mariana's \cite{mariana2019} and the events' code. 
+\end{abstract}
+
+\section{Introduction}
+
+The Orthogonal Procrustes Problem is a problem in linear Algebra that consists of finding the orthogonal matrix $\Omega$ that most closely maps matrix $A$ to matrix $B$, as formulated in \eqref{eq:w10_procrustes}.
+
+\begin{equation}
+    \label{eq:w10_procrustes}
+    R = arg min \Vert \Omega A - B \Vert _F, \text{subject to } \Omega^T\Omega=I
+\end{equation}
+
+where $ \Vert . \Vert _F$ represents the Frobenius norm.
+
+This problem is equivalent to finding the nearest orthogonal matrix to a given matrix $M=BA^T$. As such, to find the orthogonal matrix $R$, the singular value decomposition (SVD) can be used, resulting in Eqs.\,\eqref{eq:w10_m} and \eqref{eq:w10_r}.
+
+\begin{equation}
+    \label{eq:w10_m}
+    M=U\Sigma V^T
+\end{equation}
+
+\begin{equation}
+    \label{eq:w10_r}
+    R=UV^T
+\end{equation}
+
+This solution though SVD was demonstrated to be optimal (\cite{schonemann1966generalized}).
+
+\subsection{Previous Work}
+
+\cite{mariana2019} proposed a technique to estimate rotation by exploring the Orthogonal Procrustes Problem previously presented. 
+
+First, a set of features are extracted from the images before and after the (in particular, SIFT features are used). The features are then matched (using RANSAC to remove outliers), and, since depth cannot be accurately estimated using a single camera with no translation, the features are projected into a unitary sphere, thus becoming 3D landmarks. 
+
+Matrices $A$ and $B$ represent the pointclouds of landmarks detected, and the objective is to find the rotation matrix $R$ ($\Omega$ in \eqref{eq:w10_procrustes}) that maps one pointcloud to the other. 
+
+The proposed method thus estimates rotation between two frames assuming no (or minimal) translation by using the Orthogonal Procrustes Problem. Assuming this setup, this solution is optimal. Nevertheless, feature detection, matching, non-ideal movement, and other factors complicate this problem.  
+
+\subsection{Method}
+
+\subsubsection{Improvements on the implementation}
+
+Expanding on the work by \cite{mariana2019}, we added support for more than only two frames, in particular a video sequence. The idea is to apply the Orthogonal Procrustes Problem consecutively when a new frame is received, so that rotation over time can be estimated.
+
+In order to minimize the error accumulation, rather than constantly comparing the features of the current frame to the previous frame, we instead compare it to the earliest recorded frame with a minimum number of matched features. When this number is lost, the trackers are reset and the last estimated orientation becomes the reference orientation for future comparisons.
+
+Furthermore, rather that constantly detecting features, matching them and removing outliers using SIFT and RANSAC, we improved the implementation by tracking the relevant features using Lucas-Kanade tracker (\cite{lucas1981iterative}), which takes away the need for explicit feature matching and improves speed.
+
+\subsubsection{Adaptation to events}
+
+The code expects a set of 3D landmarks that are provided with each acquired frame. Events do not naturally follow this organized and expectable pattern, so changes are needed.
+
+The proposed method involves using EKLT (\cite{gehrig2020eklt}) to detect and track the features. This way we are able to asynchronously detect and track features across time, each with a fixed ID (elininating the need for a matching step, such as RANSAC in the original implementation). 
+
+In order to address the dependence on frames, we accumulute the asynchronous features over a period of time in order to simulate frames being received. Nevertheless, in order to take advantage of the fast nature of frames (which would otherwise be lost waiting for the accumulation of events and features), we kept this integration time very short (around 5\,ms, still much faster than the typical 20-35\,ms of conventional cameras).
+
+\subsection{Results}
+
+The results obtained are shown... This corresponds to a situation where....
+
+\subsection{Discussion}
+
+TODO
+
+Pros
+Faster tracking of features
+Better for high movement scenes
+More frequent updates
+
+Cons
+Less features available (only corners from eklt)
+Few features render the estimation more erroneous and less robust
+Easier for the estimation to "blow up"
+
+
+\bibliographystyle{plain}
+\bibliography{../thesis/ref}
+% replace "project" by "thesis" if you are doing the thesis
+
+\end{document}

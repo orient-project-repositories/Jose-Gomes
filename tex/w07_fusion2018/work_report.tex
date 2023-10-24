@@ -1,0 +1,219 @@
+\documentclass[10pt,twocolumn]{IEEEtran}
+% replace the keyword "twocolumn" by "onecolumn" if you want a single column document
+
+% ------------------------------------------------------------------------------------
+% If you are using *TeXnicCenter*, already configured with profiles as "LaTeX -> PDF",
+% do the following to create a project and have the compile hotkey Ctrl+F5:
+%     Project -> Create with active file as the main file
+% Do not forget to select "Uses BibTeX"
+% ------------------------------------------------------------------------------------
+
+% some useful packages:
+\usepackage{graphicx}
+\graphicspath{{./}{./figs/}{../figs/}} % share figs using ../figs/
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+
+\begin{document}
+
+\section{Introduction}
+
+Document documenting the filter structure of FUSION2018 (\cite{brossard2017unscented}). FUSION2018 proposes a filter that integrates IMU and visual information in the form of a UKF (Unscented Kalman Filter). This filter introduces several suggestions worth mentioning, such as 1) a Lie group structure for the state space (resulting in a matrix state space, rather than a vector state space), 2) integration of the landmark position in the Lie group, and 3) representation and computation of the uncertainty directly in the Lie group, rather than outside of it, followed by a conversion to the Lie group.
+
+\section{FUSION2018}
+
+This filter estimates the body pose (position and velocity) and 3D landmark positions, as well as accelerometer's and gyroscope's biases. The first two parameters (pose and landmark positions) are integrated in the Lie group structure, and the latter two (biases) are appended to the state estimation. Though this is not a SLAM implementation, as the whole area is not being mapped (only the local, current region in the vicinity of the body is estimated), the formulation itself is very similar as if it were a SLAM problem (and could be extended easily if desired).
+
+\textbf{Why use UKF (rather than EKF)?} Simple Kalman Filter is not suitable, as the system is non-linear. Between UKF and EKF, UKF has better noise robustness, due to the unscented transform allowing for the presence of stronger noise, as it does not need to linearize the system (which incorrectly model stronger noises). Also, not needing to linearize the system is also an advantage in terms of computation.
+
+\textbf{Why use Lie groups?} Rotations can be represented in several ways. The most simple and intuitive one are Euler angles. However, this representation is not without its problems, in particular gimbal lock (when two or more axes of the system converge to a parallel configuration, effectively locking the system and reducing the degrees of freedom), and wrap around problems (when the estimation reaches the limit of the interval, such as wrapping from 180 degrees to -180 degrees). Quaternions solve these problems, at the cost of loss of legibility. Lie groups, in particular the Special Orthogonal group (SO(3)) can also represent rotations, with the added benefit of allowing for the representation of differentiable quantities associated to the group by means of Lie algebra (in this case, orientation and rotation velocity). As such, in this filter, Lie groups were used.
+
+\section{Filter structure}
+
+This section explains the relevant components of the filter, namely the state, dynamic model and observation model. This filter expands on the works of \cite{barrau2015ekf}, which introduced a Lie group based EKF, following the suggestions of \cite{bonnabel2012symmetries}, that showed the similarities between the SLAM problem and the group $SE_{1+p}(3)$. \cite{loianno2016visual} proposed a UKF implementation on  $SE(3)$. Lastly, \cite{brossard2017unscented} proposed the inclusion of the landmarks into the group itself, creating a group $SE_{2+p}(3)$, coupled with a UKF implementation. Furthermore, two techniques of propagating the uncertainty were suggested, of which we kept the right uncertainty from their proposed Right-UKF-LG.
+
+\subsection{State space}
+
+The state being estimated by the filter is given by the tuple $\left( \chi, b\right)$ where $\chi$ is presented in Eq.$\,$\ref{eq:w07_state}, and corresponds to a Lie group $SE_{2+p}(3)$ that incorporates the orientation $\mathbf{R} \in SO(3)$ , velocity $\mathbf{v} \in \mathbb{R}^3$  and position $\mathbf{x} \in \mathbb{R}^3$, as well as the 3D positions of the landmarks $\mathbf{p}_1,\ldots,\mathbf{p}_p \in \mathbb{R}^3$. $b \in \mathbb{R}^6$ is the bias vector, presented in Eq.\,\eqref{eq:w07_bias}, containing the gyroscope and accelerometer biases $b_\omega$ and $b_a$. 
+
+
+\begin{equation}
+    \label{eq:w07_state}
+    \chi = \begin{bmatrix}
+        R & v & x & p_1 \cdots p_p \\ 
+         &0_{2+p\times 3}   &&I_{p+2\times p+2}
+        \end{bmatrix}
+\end{equation}
+
+\begin{equation}
+    \label{eq:w07_bias}
+    b= \begin{bmatrix}
+        b_\omega ^T b_a^T
+    \end{bmatrix}
+\end{equation}
+
+The choice of a matrix $\chi$ to represent the state may seem strange at first, but there are some advantages to this representation. 
+
+One such reason is that the use of a Lie group that encompasses almost all the variables being estimated allows for a "cleaner" and more robust mathematical formulation, without the need to convert between different types of representation (of which we highlight rotations, that may be represented by Euler angles, rotation matrices, and quaternions, among others), thus increasing numerical consistency that may arise from the usage of Sr-UKF (\ref{sec:sec2_sr_ukf}), and increasing accuracy in estimation by avoiding such conversions between representation (\cite{asl2019adaptive}, \cite{brossard2017unscented}).
+
+Another reason is legibility, as such a structure, though containing redundant information (of which we highlight rotations again, that are represented as a $SO(3)$ Lie group and contained within the $SE_{2+p}(3)$ Lie group, and its skew symmetric representation that includes multiple entries for each axis of rotation), is much easier to read and interpret than others, for instance a vector-column containing quaternions, without losing coherence, as may happen with an Euler angles and its inherent gimbal-lock problem.         
+
+
+\subsection{Dynamics model}
+
+The system can be modeled with Eqs.\,\eqref{eq:w07_dynamics} to \eqref{eq:w07_landmarks}, where we have access to angular velocity $\omega$ and linear acceleration $a$ through the IMU mounted on the system.
+
+
+\begin{equation}
+    \label{eq:w07_dynamics}
+    \text{body state } \left\{ 
+        \begin{split}
+            &\dot{\mathbf{R}} = \mathbf{R} \left(\omega - b_\omega + n_\omega \right)_\times\\ 
+            &\dot{\mathbf{v}} = \mathbf{R} \left(a - b_a + n_a \right) + g \\
+            &\dot{\mathbf{x}} = \mathbf{v}
+        \end{split} 
+     \right.
+\end{equation}
+\begin{equation}
+    \label{eq:w07_imu}
+    \text{IMU biases } \left\{ 
+        \begin{split}
+            &\dot{b_\omega} = n_{b_\omega}\\ 
+            &\dot{b_a} = n_{b_a}
+        \end{split} 
+     \right.
+\end{equation}
+\begin{equation}
+    \label{eq:w07_landmarks}
+    \text{landmarks } \left\{ 
+        \dot{\mathbf{p_i}} = 0,\,i=1,\ldots,p
+    \right.
+\end{equation}
+
+The notation $(\omega)_\times$ represents the skew symmetric matrix associated with the cross product with vector $\omega \in \mathbb{R}^3$
+
+\begin{equation}
+    n = \left[ n_\omega^T n_a^T n_{b_\omega}^T n_{b_a}^T \right]^T \sim \mathcal{N} (0,Q)
+\end{equation}
+
+\subsection{Measurement model}
+
+Visual information is also fed into the system by means of a calibrated monocular event camera, in order correct the predicted state of the system. The camera observes and tracks $p$ landmarks through the standard pinhole model and corresponding projection model (\ref{sec:sec2_projection}), as shown in Eq.\,\ref{eq:w07_features}, where $y_i$ is the normalized pixel location of the landmark in the camera frames, and $n_y\sim \mathcal{N} (0,N)$ represents the pixel image noise.
+
+\begin{equation}
+    \label{eq:w07_features}
+    y_i=\begin{bmatrix}
+        y_u^i\\ y_v^i
+    \end{bmatrix}
+    +n_y^i
+\end{equation}
+
+This location is then compared with the expected location of the feature in camera space, obtained by projecting the estimated 3D position of the landmark into camera space, as shown in Eq.\,\eqref{eq:w07_proj_land}.
+
+\begin{equation}
+    \label{eq:w07_proj_land}
+    \lambda \begin{bmatrix}
+        x_u^i\\ 
+        y_u^i\\ 
+        1
+        \end{bmatrix}
+        =
+        \Pi \left[
+        \mathbf{R}_C^T\left(\mathbf{R}^T\left(\mathbf{p}_i-x
+         \right ) -x_c
+         \right )
+         \right ]
+\end{equation}
+
+\section{Uncertainty on Lie groups}
+
+The usage of Lie groups to represent part of the state improves accuracy and numeral consistency, but comes at the cost of a more complex representation of noise. Since our state is not a vector space, the usual approach of additive noise is not possible. Following \cite{barfoot2014associating}, the probability distribution $\chi \sim \mathcal{N}_\mathcal{R} \left (\bar{\chi}, \mathbf{P} \right)$ is defined by mapping the uncertainty $\xi$ to our state by means of the exponential map in Eq.\,\ref{eq:w07_uncertainty}.
+
+\begin{equation}
+    \label{eq:w07_uncertainty}
+    \chi = exp(\xi)\bar{\chi},\, \chi\sim \mathcal{N}(0,\mathbf{P})
+\end{equation}
+
+The uncertainty $\xi = \begin{bmatrix}
+    \xi_R^T \, \xi_v^T \, \xi_x^T \, \xi_{p_1}^T \cdots \xi_{p_p}^T
+\end{bmatrix}^T$ is mapped to the Lie algebra through the transformation $\xi \mapsto \xi\,\hat{ }$ defined in Eq.\,\ref{eq:w07_unc_map}.
+
+\begin{equation}
+    \label{eq:w07_unc_map}
+    \xi\,\hat{ } = 
+    \begin{bmatrix}
+        \left( \xi_R \right)_\times \xi_v \, \xi_x \, \xi_{p_1} \cdots \xi_{p_p}\\ 0_{2+p\times 5+p}
+    \end{bmatrix}
+\end{equation}
+
+\section{UKF on Lie Groups}
+
+Our dynamical system evolves over time according to Eq.\,\eqref{eq:w07_f}, where $\chi_n$ corresponds to the proposed Lie group \eqref{eq:w07_state} at time instant $n$, $u_n=\begin{bmatrix}
+    \omega_n^T\,a_n^T
+\end{bmatrix}^T$ is a known input variable with gyroscope and accelerometer readings, and $w_n\sim \mathcal{N}(0,\mathbf{Q}_n)$ is white Gaussian noise.
+
+\begin{equation}
+    \label{eq:w07_f}
+    \chi_{n+1} = f\left( \chi_n, u_n, w_n \right)
+\end{equation}
+
+Furthermore, the system has associated a discrete measurement of the form presented in Eq.\,\eqref{eq:w07_h}, where $v_n\sim\mathcal{N}(0,\mathbf{R}_n)$ is white Gaussian noise.
+
+\begin{equation}
+    \label{eq:w07_h}
+    y_n = h\left( \chi_n, v_n \right)
+\end{equation}
+
+\subsection{Time discretization}
+
+In order to implement Eqs.\,\eqref{eq:w07_dynamics} to \eqref{eq:w07_landmarks}, a simple discretization using the Euler method is used. For the rotation, considering a small time step $\Delta T$, \eqref{eq:w07_disc} is used.
+
+\begin{equation}
+    \label{eq:w07_disc}
+    \mathbf{R}\left( t+\Delta T \right) = \mathbf{R}(t)exp\left[ \left( \omega(t) - b_\omega(t) \right) \Delta T + Cov(n_\omega)^{1/2} g \sqrt{\Delta T}\right]_\times
+\end{equation}
+
+\subsection{Final model}
+
+The various components of the system are described in Eqs.\,\eqref{eq:w07_state_final} to \eqref{eq:w07_obs_final}, where $\left( \bar{\chi}, \bar{b}_n \right) \in \mathbb{R}^{(15+3p)\times(15+3p)}$ represents the mean estimate of the state at time $n$, $\mathbf{P}_n \in \mathbb{R}^{(15+3p)\times(15+3p)}$ is the covariance matrix that defines uncertainties $\left( \xi, \tilde{b} \right)$, and the vector $\mathbf{Y}_n$ contains the observations of the $p$ landmarks with associated Gaussian noise $w_n\sim \mathcal{N}(0,W)$. 
+
+These components are implemented into an Sr-UKF-like filter, with the usual steps of propagation (based on the motion model with input from the accelerometer and the gyroscope) and update (based on the observation model and the visual information). 
+
+\begin{equation}
+    \label{eq:w07_state_final}
+    \text{state } \left\{ 
+        \begin{split}
+            \chi_n=exp(\xi)\bar{\chi}_n\\
+            b_n=\bar{b}_n+\tilde{b}
+        \end{split} \,,\,\begin{bmatrix}
+            \xi\\ \tilde{b}
+        \end{bmatrix} \sim \mathcal{N}(0,\mathbf{P}_n)
+     \right.
+\end{equation}
+\begin{equation}
+    \label{eq:w07_dyn_final}
+    \text{dynamics } \left\{ 
+        \chi_n,b_n=f\left( \chi_{n-1},u_n-b_{n-1},n_n \right)
+     \right.
+\end{equation}
+\begin{equation}
+    \label{eq:w07_obs_final}
+    \text{observations } \left\{ 
+        \begin{split}
+            \mathbf{Y}_n = \begin{bmatrix}
+                y_1^T \cdots y_p^T
+            \end{bmatrix}^T := \mathbf{Y}\left( \chi_n, w_n \right)\\
+            y_i \quad \text{given by \eqref{eq:w07_proj_land}}, i=1,\cdots,p
+        \end{split} 
+    \right.
+\end{equation}
+
+
+
+\bibliographystyle{plain}
+\bibliography{tex/thesis/ref}
+% replace "project" by "thesis" if you are doing the thesis
+
+\end{document}

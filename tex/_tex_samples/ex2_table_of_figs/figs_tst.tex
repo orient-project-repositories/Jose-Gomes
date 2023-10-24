@@ -1,0 +1,30 @@
+\documentclass{article}
+\usepackage{graphicx} % to includegraphics
+\usepackage{float} % to position figure H
+
+\title{Title of the Paper}
+\author{author}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+This abstract is very abstract
+\end{abstract}
+
+This is a fast demonstration of making composite figures. See Fig.\ref{fig:figs_tst}.
+Notice that in order to place a number of EPS files side by side, a tabular environment has been used.
+One figure can hold any number of tabular environments inside, and in this way make a composite figure of a variable number of figures in each line.
+
+\begin{figure}[H]
+	\centering
+		\begin{tabular}{ccc}
+		   \includegraphics[width=3cm]{sph_proj.eps} &
+		   \includegraphics[width=3cm]{sph_proj.eps} &
+		   \hspace{1cm} \includegraphics[width=3cm]{sph_proj.eps} \\
+		   (a) & (b) & (c) \\
+		\end{tabular}
+	\caption{text of the caption (a) is ... (b) illustrates ... (c) shows ...}
+	\label{fig:figs_tst}
+\end{figure}
+
+\end{document}

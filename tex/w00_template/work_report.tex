@@ -1,0 +1,44 @@
+\documentclass[10pt,twocolumn]{IEEEtran}
+% replace the keyword "twocolumn" by "onecolumn" if you want a single column document
+
+% ------------------------------------------------------------------------------------
+% If you are using *TeXnicCenter*, already configured with profiles as "LaTeX -> PDF",
+% do the following to create a project and have the compile hotkey Ctrl+F5:
+%     Project -> Create with active file as the main file
+% Do not forget to select "Uses BibTeX"
+% ------------------------------------------------------------------------------------
+
+% some useful packages:
+\usepackage{graphicx}
+\graphicspath{{./}{./figs/}{../figs/}} % share figs using ../figs/
+\usepackage{url}
+
+\begin{document}
+
+\title{Title}
+\author{Author}
+
+\maketitle
+
+\begin{abstract}
+Abstract text.
+\end{abstract}
+
+\section{Introduction}
+
+Introduction text, containing one citation to a very well known Computer Vision Book~\cite{Hartley00}, in order to indicate how to do citations.
+
+\section{Second Section}
+
+Text for the second section.
+
+\subsection{First Subsection}
+
+\subsection{Second Subsection}
+
+
+\bibliographystyle{plain}
+\bibliography{../project/secz}
+% replace "project" by "thesis" if you are doing the thesis
+
+\end{document}

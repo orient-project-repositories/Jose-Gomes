@@ -1,0 +1,117 @@
+%
+%   Dissertação: (colocar aqui nome próprio + apelido)
+%		July 2018
+%
+
+% Sites / docs to check:
+%
+% MEEC:
+% https://fenix.tecnico.ulisboa.pt/cursos/meec/documentos-e-regulamentos
+% https://fenix.tecnico.ulisboa.pt/downloadFile/845043405460433/DMEEC201803.pdf
+%
+% IST:
+% https://graduacao.tecnico.ulisboa.pt/alunos/dissertacao-de-mestrado/
+% https://graduacao.tecnico.ulisboa.pt/files/sites/54/guia-de-preparacao-da-dissertacao-1516.pdf
+% https://tecnico.ulisboa.pt/pt/recursos/documentos-importantes/
+
+
+% --------------------------------------------------------- CONFIG:
+
+\documentclass[a4paper,12pt]{book}
+
+%\usepackage[latin1]{inputenc}   % incluir uma imagem postscript
+%\usepackage[ansinew]{inputenc} 	% acentuação automática
+\usepackage[portuguese,english]{babel}	% titles in last chosen language
+\usepackage[ansinew]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}    					% poe letra bonita em PDF
+%\usepackage{indentfirst}		    % indenta o primeiro paragrafo de cada secção
+
+%\usepackage[dvips]{graphicx}
+\usepackage{graphicx}
+\graphicspath{{./}{./figs/}{../figs/}} % share figs using ../figs/
+\usepackage{subfigure}					% figuras paralelas ou seguidas com mesma legenda
+\usepackage{subcaption} 
+
+%\usepackage{epstopdf}
+\usepackage{color}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}          
+%\usepackage[colorlinks=false, pdfstartview=FitV, linkcolor=blue, citecolor=blue, urlcolor=blue,breaklinks=true]{hyperref}
+%\usepackage{subeqn}							% subnumerar equações
+
+\usepackage{url}
+\usepackage{glossaries}
+
+%\usepackage{hyperref}   				% poe bookmarks no ficheiro pdf
+%\PassOptionsToPackage{linktocpage}{hyperref}
+\usepackage[linktocpage=true]{hyperref}
+
+\usepackage{setspace}						% pacote de espaçamento
+\usepackage{datetime}
+\onehalfspacing									% espaçamento de 1,5 entre linhas
+%\doublespacing			 
+
+%\vspace{.5cm} 									% como por um espaçamento vertical
+
+\textwidth 			=   16cm 				% largura do texto na folha
+\textheight 		=   22cm 				%
+\oddsidemargin 	= 	0cm 				% margens na folha
+\evensidemargin =   0cm 				%
+\marginparwidth =   0pt 				% margem de paragrafos
+%\usepackage[top=25mm, bottom=25mm, left=25mm, right=25mm]{geometry}
+
+\usepackage{fancyhdr} 					% cabeçalhos
+
+\pagestyle{fancy}								% cabeçalhos do capítulo e secção em minúsculas
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{} % apagar as configurações actuais
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\bfseries\rightmark}
+\fancyhead[RE]{\bfseries\leftmark}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\addtolength{\headheight}{4.5pt} % fazer espaço para o risco
+\fancypagestyle{plain}{%
+	\fancyhead{} % Tirar cabeçalhos de página vazias
+	\renewcommand{\headrulewidth}{0pt} % e o risco
+}
+
+
+%\includeonly{sec2_meth1}
+%\includeonly{sec3_meth2}
+%\includeonly{sec4_experiments}
+
+
+% --------------------------------------------------------- MAIN:
+
+\begin{document}
+\include{msc_thesis_title} \onehalfspacing 
+
+\cleardoublepage \pagenumbering{roman}%
+
+\include{sec0_abstract}
+
+\tableofcontents % main index
+%\listoffigures
+%\listoftables
+
+\cleardoublepage \pagenumbering{arabic}
+
+\include{sec1_intro}
+\include{sec2_meth1}
+\include{sec3_meth2}
+\include{sec4_experiments}
+\include{sec5_conclusion}
+
+\appendix
+\include{secx0_app}
+\include{secx1_app}
+
+\bibliographystyle{plain}
+\bibliography{secz}
+
+\end{document}

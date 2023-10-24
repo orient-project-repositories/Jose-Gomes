@@ -1,0 +1,390 @@
+; setup.inf --- Copyright (c) 1987-1999 by Design Science, Inc.
+;
+; Project: mtw4inst, Component: ee
+; Purpose: Information file - drives the installation process.
+;
+;   ---history---
+;   ---history---
+;
+;   ---current-version--- 'version %v, %d, %t, %w'
+;   'version 2, 7-Jun-99, 11:35:04, CAINQ:DSEE'
+
+[startup]
+&logical_disks =
+&enable_remove =
+&set_remove_ops =
+;	'no_*' set to True will prevent the indicated window from being shown.
+;no_background = 0
+;no_prog_meter = 0
+; 'InstallNoDlg' set to ANY value will cause the main selection dlg to operate as if the user had just hit
+; 'OK' (equivalent to '-I' on cmd line).
+;InstallNoDlg = 1
+; These vars are needed to properly open the config file.
+ShortAppKey = EE
+; This is here for comparison with an existing .dsc file.
+MajVersion = 4
+; 'lock_*' set to ANY value will prevent the user from modifying the indicated text box in the main selection dlg. Equivalent to '-Xl' on command line.
+;lock_ProgDir = 0
+$test_floppy = do_floppy_copy_files
+&floppy_copy_files? =
+
+[floppy_copy_files]
+; Only copies/uncompresses the files if we're in a "floppy" run.
+$file_inst = <InstallFromDir>\<ShortAppKey><MajVersion>enu.h#p, <WinDir>\<ShortAppKey><MajVersion>enu.hlp
+; *************  LOCALIZATION  *************
+; All localized help files should be listed here. This enables Setup to choose the help file that the user
+; will view when a help button is clicked.
+;$file_inst = <InstallFromDir>\<ShortAppKey><MajVersion>XXX.h#p, <WinDir>\<ShortAppKey><MajVersion>XXX.hlp
+; *************  LOCALIZATION  *************
+; Setup's foreign language DLLs should all be listed here. This will enable Setup to choose the language it'll use (based on
+; the language of Windows, and the available languages), if the user hasn't already (previous install) selected one.
+;$file_inst = <InstallFromDir>\<ShortAppKey>su4XXX.d#l, <WinDir>\<ShortAppKey>su4XXX.dll
+
+[shutdown]
+$test_floppy = do_floppy_del_files
+&floppy_del_files? =
+&remove_dirs? =
+
+[floppy_del_files]
+; Only deletes the files if we're in a "floppy" run.
+$file_sys = delete,<WinDir>\<ShortAppKey><MajVersion>enu.hlp
+$file_sys = delete,<WinDir>\<ShortAppKey><MajVersion>enu.gid
+; *************  LOCALIZATION  *************
+; Any localized file added to the "floppy_copy_files" section should also be added here.
+;$file_sys = delete,<WinDir>\<ShortAppKey>su4XXX.dll
+
+[remove_dirs]
+; We'll try to delete these dirs to keep things clean, but if any files are in them, they won't be
+; deleted. We try to delete these here (from the 'shutdown' phase), because there will still be
+; files in them if we try to do them in remove's 'check sizes' or 'install' phases.
+$dir_del = <LangDir>
+$dir_del = <AppSystemDir>
+$dir_del = <TTAppDir>
+$dir_del = <FontsDir>
+$dir_del = <ProgDir>
+$dir_del = <AppDataRoot>
+
+[logical_disks]
+; This section is read and modified by the 'sed' tool.
+ExeDisk = 1
+HelpDisk = 1
+DllDisk = 1
+LangDllDisk = 0
+TTDisk = 1
+
+[enable_remove]
+; enable_<SectionName> enables the indicated checkbox in the remove dlg
+; no checkboxes in remove groupbox
+enable_remove_keep_fonts = 0
+enable_remove_keep_prefs = 0
+
+[easy_install]
+; marks certain sections for execution, and then run the master list.
+do_easy_install_list = 1
+&master =
+
+[easy_install_list]
+do_application = 1
+do_remove_old_version_files = 1
+do_setup_app = 1
+do_install_help = 1
+do_ttfonts = 1
+do_readme = 1
+do_clear_icons = 1
+
+[wkstation_install]
+; Takes the place of the "easy_install" group.
+&application_tasks =
+&ole_reg =
+&setup_app_tasks =
+&help_tasks =
+&ttfonts_tasks =
+&readme =
+&clear_icons =
+&icons? =
+
+[remove_old_version_files]
+; This section will remove files that may be left around by an old installation. These files will not be overwritten
+; by files from this (4.0) install, and need to be deleted.
+$file_sys = delete,<ProgDir>\Eqnedt32.cnt
+$file_sys = delete,<ProgDir>\Eqnedt32.hlp
+$file_sys = delete,<ProgDir>\Eqnedt32.gid
+$file_sys = delete,<ProgDir>\Eqnedt32.fts
+$file_sys = delete,<ProgDir>\Eesetup.exe
+
+[application]
+do_app_lang_libs = 0
+&application_files =
+&application_tasks =
+
+[application_files]
+f_App =
+
+[application_tasks]
+do_ole_reg = 1
+; 'add_icon' will put the particular icon in a list, and when 'add_icon_group' is called, all the icons in the list
+; will be added to the program group. The 'add_icon' task can have up to 5 parameters: 1)description for the icon/link,
+; 2)path to file, 3)command-line args for file in arg2 (opt.), 4)path to file who's icon will be shown, if different than
+; arg2 (opt.), 5)icon index for file in arg4 (opt.). Unused args must be at least one space (' ') char.
+$add_icon = <AppName>,<ProgDir>\<AppProgName>.exe
+do_icons = 1
++HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\<AppProgName>.exe\ = <ProgDir>\<AppProgName>.exe
++HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\<AppProgName>.exe\Path = <ProgDir>;
++<MachRegKey>\Config\HelpDir =
++<MachRegKey>\Config\LangDir =
++<MachRegKey>\Config\AppSystemDir =
+
+[app_lang_libs]
+; This section is a list of all the app's language libraries that will be copied
+; to the "Language" directory.
+&app_lang_libs_files =
+do_choose_lang = 1
+
+[app_lang_libs_files]
+f_AppFRALangLib =
+; *************  LOCALIZATION  *************
+; Localized version of MathType's DLL should be added here.
+;f_AppXXXLangLib =
+
+[setup_app]
+; Only do Setup's files if we're not being run from the user's hard disk.
+$test_floppy = do_setup_app_files
+&setup_app_files? =
+; Always do the tasks, though.
+&setup_app_tasks =
+
+[setup_app_files]
+f_SetupApp =
+f_InfoFile =
+
+[setup_app_tasks]
+$add_icon = Remove <AppName>,<ProgDir>\<ProgName>.exe,-R
+do_icons = 1
+do_setup_lang_libs = 0
++HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\<AppKey>\DisplayName = <AppName> <MajVersion>
++HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\<AppKey>\UninstallString = "<ProgDir>\<ProgName>.exe" -R
+
+[setup_lang_libs]
+; This section is a list of all the setup app's language libraries that will be copied
+; to the "Language" directory.
+&setup_lang_libs_files =
+do_choose_lang = 1
+
+[setup_lang_libs_files]
+f_SetupFRALangLib =
+; *************  LOCALIZATION  *************
+; Localized versions of Setup's DLL should be added here.
+;f_SetupXXXLangLib =
+
+[help]
+&help_files =
+&help_tasks =
+
+[help_files]
+f_Help =
+f_HelpCont =
+; *************  LOCALIZATION  *************
+; Localized versions of the help files should be added here.
+;f_HelpXXX =
+;f_HelpContXXX =
+
+[install_help]
+&help =
+; install_shared_dll will version-copy the file to the appropriate place for shared DLL's, and increment the refcount. Arg1 is the
+; source path for the DLL. The indicated file must reside on disk 1 for a multi-disk install.
+$install_shared_dll = <InstallFromDir>\inetwh32.dl_
+
+[remove_help]
+&help_files =
+; remove_shared_dll will locate the indicated DLL, and decrement its refcount, possibly removing the file in the process.
+$remove_shared_dll = inetwh32.dll
+
+[help_tasks]
++HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\Help\<ShortAppKey><MajVersion>enu.hlp = <ProgDir>
++HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\Help\<ShortAppKey><MajVersion>enu.cnt = <ProgDir>
+; *************  LOCALIZATION  *************
+; Localized versions of the help files should be added here.
+;+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\Help\<ShortAppKey><MajVersion>XXX.hlp = <ProgDir>
+;+HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\Help\<ShortAppKey><MajVersion>XXX.cnt = <ProgDir>
+$add_icon = <HelpName>,<HelpDir>\<HelpFile>
+do_icons = 1
+
+[ole_reg]
+; This task will perform the application's OLE registration
+$register =
+
+[all_ole_autoconverts]
+; True is used to convert all the recommended objects to this app.
+$set_all_autoconverts = True
+
+[ole_reg_mgr_all]
+; 'run_ole_mgr' will display the dialog that allows the user to select the equation types to autoconvert to the
+; main application. 'True' indicates that all the detected equation types will be listed. 'False' will cause the
+; dialog to only list the recommended types.
+$run_ole_mgr = True
+
+[ole_reg_mgr_recommended]
+$run_ole_mgr = False
+
+[convert_old_prefs]
+; 'convert_pref' takes no parameters.
+$convert_pref =
+
+[choose_lang]
+$ask_choose_lang = <UserRegKey>\Config\AppLang
+
+[readme]
+$add_icon = <ReadMeName>,WinHlp32.exe,-n <ReadMeHelpID> <HelpDir>\<HelpFile>
+do_icons = 1
+; 'create_link' task will make a link (shortcut) file. Arg1 is the location to create the shortcut file. Arg2 is the name/description
+; of the link. Arg3 is the program the shortcut will execute. Arg4 is the arguments to pass to the program in arg3. Arg5 (optional) is
+; the path of the executable whose icon we'll use. Arg6 (opt.) is the index of the icon in executable in arg5.
+$create_link = <ProgDir>,<ReadMeName>,WinHlp32.exe,-n <ReadMeHelpID> <HelpDir>\<HelpFile>
+; *************  LOCALIZATION  *************
+; Each help file should have a link to its "Read Me" topic.
+;$create_link = <ProgDir>,Read Me (language),WinHlp32.exe,-n <ReadMeHelpID> <HelpDir>\<ShortAppKey><MajVersion>XXX.hlp
+
+[icons]
+; '*_icon_group' takes the name of the program group to manipulate. The add and remove tasks should use the same string.
+$add_icon_group = <AppName> <MajVersion>
+
+[clear_icons]
+; Internet Explorer 4 (w/desktop update) causes problems when we delete, and then re-create the program group.
+$empty_icon_group = <AppName> <MajVersion>
+
+[rem_icons]
+$remove_icon_group = <AppName> <MajVersion>
+
+[install_completion_notify]
+; 'ask_view_readme' will cause Setup to pop up the successful completion dialog that allows the user to launch the ReadMe
+; file for viewing. The first arg is the variable that will trigger this dialog; the second arg is the path of the file to open.
+$ask_view_readme = do_readme,WinHlp32.exe,-n <ReadMeHelpID> <HelpDir>\<HelpFile>
+
+[ttfonts]
+&ttfonts_files =
+&ttfonts_tasks =
+
+[ttfonts_files]
+f_MTExtraTT =
+
+[ttfonts_tasks]
+; 'remove_font_name' will remove the font based on its windows name (not the filename), and its type ('raster', 'bitmap', or 'TrueType')
+$remove_font_name = MT Extra Plain,TrueType
+$remove_font_name = MT Extra Regular,TrueType
+$remove_font_name = MT Extra,raster
+; 'install_tt_font' takes a source path, and a destination path.
+$install_tt_font = <TTAppDir>\mtextra.ttf,	<TTSysDir>\mtextra.ttf
+$tt_fontchange_notify =
+
+[files]
+f_App=<ExeDisk>, <AppProgName>.e#e, <ProgDir>\<AppProgName>.exe,1151488
+f_SetupApp=<ExeDisk>, <ProgName>.e#e, <ProgDir>\<ProgName>.exe,324096
+; Leading '*' makes the file hidden on installation.
+f_InfoFile=<ExeDisk>, Setup.i#f, *<ProgDir>\Setup.inf,15570
+; If foreign languages aren't enabled, 'LangDllDisk' will be 0 (verify will skip it).
+f_AppFRALangLib=<LangDllDisk>, <ShortAppKey><MajVersion>fra.d#l, <LangDir>\<ShortAppKey><MajVersion>fra.dll,129536
+f_SetupFRALangLib=<LangDllDisk>, <ShortAppKey>su4fra.d#l, <LangDir>\<ShortAppKey>su4fra.dll,90624
+; *************  LOCALIZATION  *************
+; The following 2 lines are templates for foreign language files. Copy these lines, uncomment them, and replace 'XXX' by
+; the 3-letter language code. The file placeholders are used elsewhere in this file. The same should be done for where
+; they are used.
+;f_AppXXXLangLib=<LangDllDisk>, <ShortAppKey><MajVersion>XXX.d#l, <LangDir>\<ShortAppKey><MajVersion>XXX.dll,129536
+;f_SetupXXXLangLib=<LangDllDisk>, <ShortAppKey>su4XXX.d#l, <LangDir>\<ShortAppKey>su4XXX.dll,90624
+f_Help=<HelpDisk>, <ShortAppKey><MajVersion>enu.h#p, <HelpDir>\<ShortAppKey><MajVersion>enu.hlp,127083
+f_HelpCont=<HelpDisk>, <ShortAppKey><MajVersion>enu.c#t, *<HelpDir>\<ShortAppKey><MajVersion>enu.cnt,3637
+; *************  LOCALIZATION  *************
+; Localized versions of the help files should be added here.
+;f_HelpXXX=<HelpDisk>, <ShortAppKey><MajVersion>XXX.h#p, <HelpDir>\<ShortAppKey><MajVersion>XXX.hlp,21410
+;f_HelpContXXX=<HelpDisk>, <ShortAppKey><MajVersion>XXX.c#t, *<HelpDir>\<ShortAppKey><MajVersion>XXX.cnt,403
+f_MTExtraTT=<TTDisk>, mtextra.t#f, <TTAppDir>\mtextra.ttf,26276
+; Files in list for removal. With a disk# of 0, verify will ignore the item.
+; Also, Arg2 (source path) isn't used during removal.
+rem_HelpGidENU=0, notused, <HelpDir>\<ShortAppKey><MajVersion>enu.gid,0
+rem_HelpFullTextSearchENU=0, notused, <HelpDir>\<ShortAppKey><MajVersion>enu.fts,0
+; Any localized help files may have been use, generating a .gid file.
+;rem_HelpGidXXX=0, notused, <HelpDir>\<ShortAppKey><MajVersion>XXX.gid,0
+;rem_HelpFullTextSearchXXX=0, notused, <HelpDir>\<ShortAppKey><MajVersion>XXX.fts,0
+rem_DebugOut=0, notused, <ProgDir>\debug.out,0
+rem_ReadmeLink=0, notused, <ProgDir>\<ReadMeName>.lnk,0
+
+[master]
+&easy_install_list? =
+&remove_old_version_files? =
+&wkstation? =
+&setup_app? =
+&setup_lang_libs? =
+&application? =
+&app_lang_libs? =
+&install_help? =
+&readme? =
+&ttfonts? =
+&choose_lang? =
+&ole_reg? =
+&clear_icons? =
+&rem_icons? =
+&icons? =
+&all_ole_autoconverts? =
+&ole_reg_mgr_recommended? =
+&ole_reg_mgr_all? =
+&convert_old_prefs? =
+&install_completion_notify =
+
+[remove]
+-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\<AppKey>\ =
+-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\<AppProgName>.exe\ =
+-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\Help\<ShortAppKey><MajVersion>enu.hlp =
+-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\Help\<ShortAppKey><MajVersion>enu.cnt =
+; *************  LOCALIZATION  *************
+; Add all localized help files (and contents pages) here.
+;-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\Help\<ShortAppKey><MajVersion>XXX.hlp =
+;-HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\Help\<ShortAppKey><MajVersion>XXX.cnt =
+&remove_keep_fonts? =
+&remove_tt_fonts? =
+&remove_keep_prefs? =
+&remove_prefs? =
+; must complete the ole registration before we remove the files
+&ole_reg =
+&remove_files =
+&rem_icons =
+do_remove_dirs = 1
+
+[set_remove_ops]
+; none of these sections can be used on the master list
+do_remove_tt_fonts = 0
+do_remove_prefs = 1
+do_remove_files = 1
+
+[remove_prefs]
+; 'remove_ini_path' will determine what sort of ini source the param indicates (file or reg), and will remove/delete it.
+$remove_ini_path = <MachRegKey>
+$remove_ini_path = <UserRegKey>
+
+[remove_files]
+; The following sections and files will always be removed on any "remove" operation.
+&application_files =
+&setup_app_files =
+&app_lang_libs_files =
+&setup_lang_libs_files =
+&remove_help =
+&ttfonts_files =
+; remove some files that weren't installed (created by app or setup, etc.)
+rem_HelpGidENU =
+rem_HelpFullTextSearchENU =
+rem_DebugOut =
+rem_ReadmeLink =
+
+[remove_keep_fonts]
+; if this section is performed, the remove fonts sections will be turned off (not removed).
+do_remove_tt_fonts = 0
+
+[remove_keep_prefs]
+; if this section is performed, the remove prefs section will be turned off (not removed).
+do_remove_prefs = 0
+
+[remove_tt_fonts]
+; 'remove_tt_font' will remove a TrueType font, based on the font file, rather than the font name.
+$remove_tt_font = <TTSysDir>\mtextra.ttf
+$remove_tt_font = <TTSysDir>\mtextrab.ttf
+; notifies windows that the font changes are complete
+$tt_fontchange_notify =
+

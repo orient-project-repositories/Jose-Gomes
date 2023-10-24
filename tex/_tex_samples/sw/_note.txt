@@ -1,0 +1,6 @@
+
+Most latex SW is free, please find it in the web
+
+TeXAide is a formulas editor for windows,
+	which had in the past a free version but does not anymore
+	the once in the past free version is saved in .\teXaide

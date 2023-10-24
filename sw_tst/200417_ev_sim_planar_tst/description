@@ -1,0 +1,33 @@
+Obective:
+	Get the Panoramic Renderer to work. Relies on ESIM. 
+    This moves virtual camera over an image (.jpg file, for example), allowing for the generation of events.
+
+Requisites:
+    ESIM correctly installed. All files should be present if the simulator has been correclty installed.
+    Image files to be used (default ones are available with the simulator as well).
+
+Output:
+    Produces topics similar to a DAVIS camera using rpg_ros_driver, namely events and images.
+
+
+Instructions (adapted from https://github.com/uzh-rpg/rpg_esim/wiki/Planar-Renderer):
+    
+    First set the absolute paths in example.conf (namely, replace "user" in the path with the correct user, in both "calib_filename" and "renderer_texture").
+    The "renderer_texture" parameter is where the image to be used is selected.
+
+        roscd esim_ros
+        gedit cfg/example.conf 
+
+    Run the simulator as follows:
+
+        roslaunch esim_ros esim.launch config:=cfg/example.conf
+
+    To visualize the output of the simulator, you can open rviz (from a new terminal) as follows:
+
+        roscd esim_visualization
+        rviz -d cfg/esim.rviz
+
+    You can also open rqt for more visualizations, as follows:
+
+        roscd esim_visualization
+        rqt --perspective-file cfg/esim.perspective

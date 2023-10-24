@@ -1,0 +1,19 @@
+function ret= addpathxinfo
+
+% Usage assuming "matlab.my\util\addpathx.m" is in the path:
+% >> addpathx('c:\my\folder\containing\this\folder')
+% (please make sure addpathx.m is upto date)
+
+ret= {
+'', 'data'; ...
+'', 'sw'; ...
+'', 'sw_tst'; ...
+'', 'FUSION2018/data'; ...
+'', 'FUSION2018/filters'; ...
+'', 'FUSION2018/myToolbox'; ...
+};
+
+% Note: FUSION2018/* is elsewhere
+%   you need to indicate the paths on your computer
+
+return

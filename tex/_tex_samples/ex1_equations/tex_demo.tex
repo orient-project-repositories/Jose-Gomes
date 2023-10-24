@@ -1,0 +1,28 @@
+\documentclass[a4paper]{IEEEconf}
+
+\title{Example of writing very simple equations using LaTeX}
+\author{author1 author2 author3}
+
+
+\begin{document}
+\maketitle
+
+% Comments (lines starting with \%) do not appear in the final document.
+%   See in the following: inline, own-line, own-line & numbered equations
+
+This is a demo tex file. Example of one equation, inline with the paragraph is
+$ \sum\limits_i {a_i  + b_i } $ .
+%
+The same equation can be shown in its own line:
+$$ \sum\limits_i {a_i  + b_i } \ \ . $$
+%
+The same equation occupying its own line and being numbered, looks like this: 
+%
+\begin{equation}
+ \sum\limits_i {a_i  + b_i }
+ \label{eq:first_eq}  \ \ .
+\end{equation}
+
+Another equation inline $y=x+y$, which is completely different from Eq.\ref{eq:first_eq} -- this is an illustration on how to reference numbered (labeled) equations.
+
+\end{document}
